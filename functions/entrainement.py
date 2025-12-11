@@ -10,6 +10,7 @@ import joblib
 import seaborn as sns
 import matplotlib.pyplot as plt
 import numpy as np
+import os
 
 
 
@@ -185,5 +186,27 @@ class NewsClassifier:
     # Save Model
     # -----------------------------
     def save_model(self, path='../models/news_classifier.pkl'):
-        joblib.dump(self.model, path)
-        print(f"Model saved to {path}")
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+
+        model_to_save = self.best_model if self.best_model else self.model
+        
+        joblib.dump(model_to_save, path)
+        print(f"✅ Model saved to {os.path.abspath(path)}")
+
+
+    # -----------------------------
+    # Load Model
+    # -----------------------------
+    def load_model(self, path='../models/news_classifier.pkl'):
+        if os.path.exists(path):
+            self.model = joblib.load(path)
+            self.best_model = self.model
+            print(f"✅ Model loaded from {os.path.abspath(path)}")
+            return True
+        else:
+            print(f"❌ Model file not found at: {os.path.abspath(path)}")
+            return False
+
+
+    def predict(self, embeddings):
+        return self.model.predict(embeddings)
