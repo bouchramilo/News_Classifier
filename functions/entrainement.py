@@ -185,7 +185,11 @@ class NewsClassifier:
     # -----------------------------
     # Save Model
     # -----------------------------
-    def save_model(self, path='../models/news_classifier.pkl'):
+    def save_model(self, path=None):
+        if path is None:
+            base_dir = os.path.dirname(os.path.abspath(__file__))
+            path = os.path.join(base_dir, '..', 'models', 'news_classifier.pkl')
+
         os.makedirs(os.path.dirname(path), exist_ok=True)
 
         model_to_save = self.best_model if self.best_model else self.model
@@ -197,7 +201,11 @@ class NewsClassifier:
     # -----------------------------
     # Load Model
     # -----------------------------
-    def load_model(self, path='../models/news_classifier.pkl'):
+    def load_model(self, path=None):
+        if path is None:
+            base_dir = os.path.dirname(os.path.abspath(__file__))
+            path = os.path.join(base_dir, '..', 'models', 'news_classifier.pkl')
+
         if os.path.exists(path):
             self.model = joblib.load(path)
             self.best_model = self.model
