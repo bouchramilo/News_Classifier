@@ -2,11 +2,23 @@
 
 
 from sentence_transformers import SentenceTransformer
+# Monkeypatch sqlite3 for ChromaDB compatibility
+__import__('pysqlite3')
+import sys
+sys.modules['sqlite3'] = sys.modules.pop('pysqlite3')
+
 import chromadb
+
 import pandas as pd
 
+import os
+
 class EmbeddingManager:
-    def __init__(self, model_name="sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2", db_path='../data/chroma_db'):
+    def __init__(self, model_name="sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2", db_path=None):
+        if db_path is None:
+            base_dir = os.path.dirname(os.path.abspath(__file__))
+            db_path = os.path.join(base_dir, '..', 'data', 'chroma_db')
+            
         self.model = SentenceTransformer(model_name)
         self.client = chromadb.PersistentClient(path=db_path)
         

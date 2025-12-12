@@ -1,0 +1,13 @@
+apache-airflow==2.9.1
+pandas
+numpy
+scikit-learn
+datasets
+sentence-transformers
+chromadb
+seaborn
+matplotlib
+joblib
+nltk
+pysqlite3-binary
+methodtools

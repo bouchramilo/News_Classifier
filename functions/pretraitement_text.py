@@ -4,9 +4,7 @@ import nltk
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
 
-nltk.download('punkt')
-nltk.download('punkt_tab')
-
+# Downloads moved inside functions/Dockerfile to avoid DAG parsing overhead
 
 # ! $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 def clean_text(text):
@@ -25,14 +23,27 @@ def clean_text(text):
     
 # ! $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 def tokenize_text(text):
+    # Ensure necessary data is present (handled by Dockerfile mostly, but safe fallback)
+    try:
+        nltk.data.find('tokenizers/punkt')
+    except LookupError:
+         nltk.download('punkt', quiet=True)
+         nltk.download('punkt_tab', quiet=True)
+         
     return word_tokenize(text)
 
 # ! $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
-nltk.download('stopwords')
-stop_words = stopwords.words('english')
 
 def remove_stopwords(tokens):
-    return [word for word in tokens if word not in stop_words]
+    # Lazy load stopwords to check efficiently
+    if not hasattr(remove_stopwords, 'stop_set'):
+        try:
+            nltk.data.find('corpora/stopwords')
+        except LookupError:
+            nltk.download('stopwords', quiet=True)
+        remove_stopwords.stop_set = set(stopwords.words('english'))
+        
+    return [word for word in tokens if word not in remove_stopwords.stop_set]
 
 
 # ! $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
