@@ -118,7 +118,9 @@ Cette commande :
 - initialise la pipeline NLP,
 - rend l’application Streamlit accessible.
 
+
 3️⃣ Accéder aux services
+
 🔹 Apache Airflow
 
 - URL : `http://localhost:8080`
